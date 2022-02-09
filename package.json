@@ -1,0 +1,47 @@
+{
+  "name": "magipoka",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "uttk <46495635+uttk@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf dist/",
+    "test": "vitest",
+    "build": "yarn run clean && run-p build:*",
+    "build:browser": "rollup -c",
+    "build:type": "tsc --emitDeclarationOnly --declaration --outDir dist --project ./tsconfig.json",
+    "lint": "run-p lint:*",
+    "lint:tsc": "tsc --noEmit --project ./tsconfig.json",
+    "lint:eslint": "eslint --cache \"./{src,tests}/**/*.{js,ts}\"",
+    "lint:prettier": "prettier --check \"./{src,tests}/**/*.{js,ts}\"",
+    "fix": "run-s fix:*",
+    "fix:eslint": "eslint --cache --fix \"./{src,tests}/**/*.{js,ts}\"",
+    "fix:prettier": "prettier --write \"./{src,tests}/**/*.{js,ts}\""
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.16",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
+    "eslint": "^8.6.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.1.7",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.64.0",
+    "rollup-plugin-esbuild": "^4.8.2",
+    "typescript": "^4.5.4",
+    "vitest": "^0.1.16"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix --cache",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  }
+}
