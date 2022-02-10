@@ -18,8 +18,11 @@
     "fix:eslint": "eslint --cache --fix \"./{src,tests}/**/*.{js,ts}\"",
     "fix:prettier": "prettier --write \"./{src,tests}/**/*.{js,ts}\""
   },
+  "dependencies": {
+    "commander": "^9.0.0"
+  },
   "devDependencies": {
-    "@types/node": "^17.0.16",
+    "@types/node": "^17.0.17",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
     "eslint": "^8.6.0",
