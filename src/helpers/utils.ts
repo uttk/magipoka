@@ -1,5 +1,5 @@
-import path from "path";
 import fs from "fs/promises";
+import path from "path";
 
 export const getExistsPath = (paths: string | string[]): Promise<string> => {
   paths = Array.isArray(paths) ? paths : [paths];

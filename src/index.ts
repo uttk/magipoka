@@ -1,5 +1,7 @@
 import path from "path";
+
 import { Command } from "commander";
+
 import { version } from "../package.json";
 
 const cli = new Command();

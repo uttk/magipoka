@@ -39,7 +39,7 @@ module.exports = {
         "import/order": [
           "error",
           {
-            groups: ["type", "external", "internal", "sibling"],
+            groups: ["type", "builtin", "external", "internal", "sibling"],
             pathGroups: [],
             alphabetize: {
               order: "asc",

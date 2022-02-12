@@ -1,4 +1,3 @@
-import path from "path";
 import { it, describe, expect, vi } from "vitest";
 
 import { getPages, getNextJsPageExtensions } from "./nextjs";
