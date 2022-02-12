@@ -1,16 +1,38 @@
 import fs from "fs/promises";
 import path from "path";
 
-export const getNextJsPageExtensions = async (
-  configPath: string
-): Promise<string[]> => {
-  const config = await import(configPath);
+import { getNextJsPageExtensions } from "../helpers/nextjs";
+import { getExistsPath, getPageFilePaths } from "../helpers/utils";
 
-  return Array.isArray(config.pageExtensions) ? config.pageExtensions : [".ts"];
-};
+export const getPages = async (): Promise<string[]> => {
+  const cwd = process.cwd();
 
-export const getPages = async () => {
-  return [];
+  const [pagesPath, pageExtensions] = await Promise.all([
+    getExistsPath([path.join(cwd, "pages"), path.join(cwd, "src", "pages")]),
+    getNextJsPageExtensions(cwd),
+  ]);
+
+  const pages = await getPageFilePaths(pagesPath, pageExtensions);
+
+  const extPattern = new RegExp(pageExtensions.join("|").replace(/\./g, "\\."));
+  const pagePattern = new RegExp(`(?:${extPattern.source})$`);
+  const paramPattern = new RegExp(`^\[(.+)\](?:${extPattern.source})$`);
+
+  return pages.flatMap((page) => {
+    if (!page.match(pagePattern)) return [];
+
+    const newPagePath = page
+      .replace(pagesPath, "")
+      .split("/")
+      .map((node) => {
+        const result = node.match(paramPattern);
+
+        return !result ? node.replace(extPattern, "") : `{${result[1]}}`;
+      })
+      .join("/");
+
+    return [newPagePath];
+  });
 };
 
 export default async (): Promise<string> => {
