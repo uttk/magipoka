@@ -1,49 +1,20 @@
 import fs from "fs/promises";
 import path from "path";
 
-import { getNextJsPageExtensions } from "../helpers/nextjs";
-import { getExistsPath, getPageFilePaths } from "../helpers/utils";
-
-export const getPages = async (): Promise<string[]> => {
-  const cwd = process.cwd();
-
-  const [pagesPath, pageExtensions] = await Promise.all([
-    getExistsPath([path.join(cwd, "pages"), path.join(cwd, "src", "pages")]),
-    getNextJsPageExtensions(cwd),
-  ]);
-
-  const pages = await getPageFilePaths(pagesPath, pageExtensions);
-
-  const extPattern = new RegExp(pageExtensions.join("|").replace(/\./g, "\\."));
-  const pagePattern = new RegExp(`(?:${extPattern.source})$`);
-  const paramPattern = new RegExp(`^\[(.+)\](?:${extPattern.source})$`);
-
-  return pages.flatMap((page) => {
-    if (!page.match(pagePattern)) return [];
-
-    const newPagePath = page
-      .replace(pagesPath, "")
-      .split("/")
-      .map((node) => {
-        const result = node.match(paramPattern);
-
-        return !result ? node.replace(extPattern, "") : `{${result[1]}}`;
-      })
-      .join("/");
-
-    return [newPagePath];
-  });
-};
+import { getNextJsPageExtensions, getNextJsPages } from "../helpers/nextjs";
+import { getExistsPath } from "../helpers/utils";
 
 export default async (): Promise<string> => {
-  const pages = await getPages();
+  const cwd = process.cwd();
+  const modulePath = path.join(process.cwd(), "node_modules/next/dist/client/link.d.ts");
 
-  const pageList = pages.join("|");
+  const [pagesPath, pageExtensions, typeModule] = await Promise.all([
+    getExistsPath([path.join(cwd, "pages"), path.join(cwd, "src/pages")]),
+    getNextJsPageExtensions(cwd),
+    fs.readFile(modulePath, "utf-8"),
+  ]);
 
-  const linkPath = "node_modules/next/dist/client/link.d.ts";
-  const modulePath = path.resolve(process.cwd(), linkPath);
-
-  const typeModule = await fs.readFile(modulePath, "utf-8");
+  const pages = await getNextJsPages({ pagesPath, pageExtensions });
 
   return `
       declare module "__next/link__" {
@@ -54,7 +25,7 @@ export default async (): Promise<string> => {
         import Link from "__next/link__";
 
         type LinkType = typeof Link;
-        type PageType = ${pageList};     
+        type PageType = ${pages.join("|")};     
         
         type ExtendPageType<T> = { href: Exclude<T, string> | PageType };
 

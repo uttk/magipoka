@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import fs from "fs/promises";
 
 import { vi, describe, it, expect } from "vitest";
 
-import { getExistsPath, getPageFilePaths, isSameExtension } from "./utils";
+import { getExistsPath, getFilePaths, isSameExtension } from "./utils";
 
 const spy = vi.spyOn(fs, "access");
 
@@ -26,20 +28,16 @@ describe("isSameExtension() Tests", () => {
     const exts = [".js", ".ts"];
 
     const matchFiles = ["index.js", "hoge.ts"];
-    matchFiles.forEach((file) =>
-      expect(isSameExtension(file, exts)).toBe(true)
-    );
+    matchFiles.forEach((file) => expect(isSameExtension(file, exts)).toBe(true));
 
     const notMatchFiles = ["hello.jsx", "world.tsx"];
-    notMatchFiles.forEach((file) =>
-      expect(isSameExtension(file, exts)).toBe(false)
-    );
+    notMatchFiles.forEach((file) => expect(isSameExtension(file, exts)).toBe(false));
   });
 });
 
 const readdirSpy = vi.spyOn(fs, "readdir");
 
-describe("getPageFilePaths() Tests", () => {
+describe("getFilePaths() Tests", () => {
   it("return file paths from passed root path", async () => {
     const exts = [".page"];
 
@@ -50,7 +48,7 @@ describe("getPageFilePaths() Tests", () => {
 
     readdirSpy.mockReturnValue(mockFiles);
 
-    const result = await getPageFilePaths("/root", exts);
+    const result = await getFilePaths("/root", exts);
 
     expect(result).toStrictEqual([`/root/${mockFiles[0].name}`]);
   });

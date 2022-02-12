@@ -10,10 +10,7 @@ export const isSameExtension = (name: string, exts: string[]): boolean => {
   return !!name.match(new RegExp(`(?:${exts.join("|").replace(".", "\\.")})$`));
 };
 
-export const getPageFilePaths = async (
-  root: string,
-  pageExtensions: string[]
-): Promise<string[]> => {
+export const getFilePaths = async (root: string, pageExtensions: string[]): Promise<string[]> => {
   const filePaths: string[] = [];
   const tasks: Promise<string[]>[] = [];
 
@@ -27,7 +24,7 @@ export const getPageFilePaths = async (
         filePaths.push(folderPath);
       }
     } else if (child.isDirectory()) {
-      tasks.push(getPageFilePaths(folderPath, pageExtensions));
+      tasks.push(getFilePaths(folderPath, pageExtensions));
     }
   }
 
