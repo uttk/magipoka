@@ -62,7 +62,7 @@ cli.action(async (argv, options) => {
     default: { format },
   } = await import("prettier");
 
-  const fileStr = format(types.join(""), { parser: "typescript" });
+  const fileStr = format(types.join(""), { parser: "typescript", printWidth: 100 });
   const outputPath = path.join(config.output.dir, config.output.filename);
 
   await fs.writeFile(outputPath, fileStr);

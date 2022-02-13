@@ -25,23 +25,51 @@ export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
 
   const extPattern = new RegExp(pageExtensions.join("|").replace(/\./g, "\\."));
   const pagePattern = new RegExp(`(?:${extPattern.source})$`);
-  const paramPattern = new RegExp(`^\[(.+)\]`);
+  const paramPattern = /^\[([^\.]+)\]/;
+  const catchAllPattern = /^\[(\.\.\.[^\.]+)\]/;
 
-  return pages.flatMap((page) => {
-    if (!page.match(pagePattern)) return [];
+  const pageList: Record<string, boolean> = {};
 
-    const newPagePath = page
+  pages.forEach((page) => {
+    if (!page.match(pagePattern)) return;
+
+    const newPages = page
       .replace(pagesPath, "")
       .split("/")
-      .flatMap((value) => {
-        const node = value.replace(extPattern, "");
-        const result = node.match(paramPattern);
+      .map((value) => {
+        const name = value.replace(extPattern, "");
 
-        return [!result ? (node === "index" ? "" : node) : `{${result[1]}}`];
+        if (value.length === 0 || name === "index") return "";
+        if (value.match(paramPattern)) return "${string}";
+        if (value.match(catchAllPattern)) return "${...string}";
+
+        return name;
       });
 
-    if (newPagePath.length === 0) return ["/"];
+    const len = newPages.length;
+    const last = newPages[len - 1];
+    const secondLast = newPages[len - 2];
 
-    return [newPagePath.join("/")];
+    if (last === "${string}") newPages.push("");
+    if (last === "" && secondLast.length && secondLast !== "${string}") newPages.pop();
+
+    pageList[newPages.join("/")] = true;
+
+    if (page === "/index.tsx") {
+      console.log({ pageList, newPages });
+    }
   });
+
+  return Object.keys(pageList);
 };
+
+"/[sample]/[param]/index.tsx".split("/").flatMap((value) => {
+  if (value.length === 0) return [""];
+
+  const node = [];
+
+  if (value.match(/\[.+\]/)) node.push("${string}");
+  if (value.match(/.tsx$/)) node.push(value.match("index") ? "" : value.replace(".tsx", ""));
+
+  return node;
+});
