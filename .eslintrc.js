@@ -26,7 +26,7 @@ module.exports = {
     },
   },
 
-  ignorePatterns: [".eslintrc.js", "/dist/", "/node_modules/"],
+  ignorePatterns: [".eslintrc.js", "/dist/", "/node_modules/", "examples"],
 
   overrides: [
     {
