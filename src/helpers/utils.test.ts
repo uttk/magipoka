@@ -6,20 +6,17 @@ import { vi, describe, it, expect } from "vitest";
 
 import { getExistsPath, getFilePaths, isSameExtension } from "./utils";
 
-const spy = vi.spyOn(fs, "access");
-
 describe("getExistsPath() Tests", () => {
   it("return a exists path", async () => {
     const paths = ["/bad/path", "/good/path"];
-
-    const mock = spy.mockImplementation(async (path) => {
+    const accessMock = vi.spyOn(fs, "access").mockImplementation(async (path) => {
       if (path !== paths[1]) throw new Error();
     });
 
     const result = await getExistsPath(paths);
 
     expect(result).toBe(paths[1]);
-    expect(mock).toBeCalled();
+    expect(accessMock).toBeCalled();
   });
 });
 

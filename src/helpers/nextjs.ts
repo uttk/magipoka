@@ -8,7 +8,7 @@ export interface NextConfig {
 }
 
 export const getNextJsPageExtensions = async (rootPath: string): Promise<string[]> => {
-  const defaultExtensions = [".tsx"];
+  const defaultExtensions = [".jsx", ".tsx"];
   const configPath = path.join(rootPath, "next.config.js");
 
   const config = await import(configPath);
@@ -25,7 +25,7 @@ export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
 
   const extPattern = new RegExp(pageExtensions.join("|").replace(/\./g, "\\."));
   const pagePattern = new RegExp(`(?:${extPattern.source})$`);
-  const paramPattern = new RegExp(`^\[(.+)\](?:${extPattern.source})$`);
+  const paramPattern = new RegExp(`^\[(.+)\]`);
 
   return pages.flatMap((page) => {
     if (!page.match(pagePattern)) return [];
@@ -33,13 +33,15 @@ export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
     const newPagePath = page
       .replace(pagesPath, "")
       .split("/")
-      .map((node) => {
+      .flatMap((value) => {
+        const node = value.replace(extPattern, "");
         const result = node.match(paramPattern);
 
-        return !result ? node.replace(extPattern, "") : `{${result[1]}}`;
-      })
-      .join("/");
+        return [!result ? (node === "index" ? "" : node) : `{${result[1]}}`];
+      });
 
-    return [newPagePath];
+    if (newPagePath.length === 0) return ["/"];
+
+    return [newPagePath.join("/")];
   });
 };
