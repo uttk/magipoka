@@ -58,14 +58,3 @@ export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
 
   return Object.keys(pageList);
 };
-
-"/[sample]/[param]/index.tsx".split("/").flatMap((value) => {
-  if (value.length === 0) return [""];
-
-  const node = [];
-
-  if (value.match(/\[.+\]/)) node.push("${string}");
-  if (value.match(/.tsx$/)) node.push(value.match("index") ? "" : value.replace(".tsx", ""));
-
-  return node;
-});
