@@ -1,6 +1,5 @@
 import type { TypeGenerator } from "../types";
 
-import fs from "fs/promises";
 import path from "path";
 
 import { getNextJsPageExtensions, getNextJsPages } from "../helpers/nextjs";
@@ -10,12 +9,10 @@ const defaultPages = ["//${string}", "http://${string}", "https://${string}"];
 
 const generator: TypeGenerator = async () => {
   const cwd = process.cwd();
-  const modulePath = path.join(process.cwd(), "node_modules/next/dist/client/link.d.ts");
 
-  const [pagesPath, pageExtensions, typeModule] = await Promise.all([
+  const [pagesPath, pageExtensions] = await Promise.all([
     getExistsPath([path.join(cwd, "pages"), path.join(cwd, "src/pages")]),
     getNextJsPageExtensions(cwd).catch(() => [".jsx", ".tsx"]),
-    fs.readFile(modulePath, "utf-8"),
   ]);
 
   const pages = await getNextJsPages({ pagesPath, pageExtensions });
@@ -23,27 +20,37 @@ const generator: TypeGenerator = async () => {
   pages.push(...defaultPages);
 
   return `
-    declare module "__next/link__" {
-      ${typeModule.replace(/\bdeclare\b/g, "")}
-    }
-
     declare module "next/link" {
-      import Link from "__next/link__";
+      /// <reference types="node" />
+      import React from "react";
+      import { UrlObject } from "url";
 
-      type LinkType = typeof Link;
-      type LinkArgs = Parameters<LinkType>;
-      type LinkReturn = ReturnType<LinkType>;    
       type PageType = ${pages.map((v) => `\`${v}\``).join("|")};
 
-      type ExtendPageType<T> = { href: Exclude<T, string> | PageType };
+      type Url = UrlObject | PageType;
 
-      type InjectCustomType<A> = A extends [infer F, ...infer N]
-        ? F extends { href: any }
-          ? [Omit<F, "href"> & ExtendPageType<F["href"]>, ...InjectCustomType<N>]
-          : [F, ...InjectCustomType<N>]
-        : A;
+      export type LinkProps = {
+        href: Url;
+        as?: Url;
+        replace?: boolean;
+        scroll?: boolean;
+        shallow?: boolean;
+        passHref?: boolean;
+        prefetch?: boolean;
+        locale?: string | false;
+      };
 
-      export default function CustomLink(...args: InjectCustomType<LinkArgs>): LinkReturn;
+      function Link(props: React.PropsWithChildren<LinkProps>): React.DetailedReactHTMLElement<
+        {
+          onMouseEnter?: React.MouseEventHandler<Element> | undefined;
+          onClick: React.MouseEventHandler;
+          href?: string | undefined;
+          ref?: any;
+        },
+        HTMLElement
+      >;
+
+      export default Link;
     }
   `;
 };

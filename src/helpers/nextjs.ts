@@ -54,10 +54,6 @@ export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
     if (last === "" && secondLast.length && secondLast !== "${string}") newPages.pop();
 
     pageList[newPages.join("/")] = true;
-
-    if (page === "/index.tsx") {
-      console.log({ pageList, newPages });
-    }
   });
 
   return Object.keys(pageList);
