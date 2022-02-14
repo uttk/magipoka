@@ -6,7 +6,7 @@ import path from "path";
 import { Argument, Command } from "commander";
 
 import * as Generator from "./generator";
-import { mergeConfig } from "./helpers/utils";
+import { isExistsPath } from "./helpers/utils";
 
 import { version } from "../package.json";
 
@@ -23,9 +23,10 @@ cli
 // options
 cli
   .addArgument(new Argument("<target>", "oputput target").choices(supportTargets))
+  .option("-f, --force", "Forces the output of the files")
   .option("-r, --rootDir <path>", "set a root directory path")
-  .option("-c, --config <path>", "set the config path")
-  .option("-o, --outDir <path>", "set a output directry path");
+  .option("-o, --outDir <path>", "set a output directry path")
+  .option("-n, --filename <name>", "set the output file name");
 
 // actions
 cli.action(async (argv, options) => {
@@ -33,17 +34,12 @@ cli.action(async (argv, options) => {
     process.chdir(options.rootDir);
   }
 
-  let config: MagipokaStrictConfig = {
+  const config: MagipokaStrictConfig = {
     output: {
-      dir: process.cwd(),
-      filename: "index.d.ts",
+      dir: path.join(process.cwd(), options.outDir || ""),
+      filename: options.filename || "magipoka.d.ts",
     },
   };
-
-  if (options.config) {
-    const customConfig = await import(path.resolve(options.config));
-    config = mergeConfig(customConfig.default, config);
-  }
 
   const types: string[] = [];
 
@@ -65,6 +61,19 @@ cli.action(async (argv, options) => {
   const fileStr = format(types.join(""), { parser: "typescript", printWidth: 100 });
   const outputPath = path.join(config.output.dir, config.output.filename);
 
+  const exist = await isExistsPath(outputPath);
+
+  if (exist && !options.force) {
+    console.error(
+      "The output destination already exists. To overwrite, use the `-f, --force` options."
+    );
+
+    process.exitCode = 1;
+
+    return;
+  }
+
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
   await fs.writeFile(outputPath, fileStr);
 });
 
