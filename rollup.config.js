@@ -1,13 +1,27 @@
 import esbuild from "rollup-plugin-esbuild";
 import jsonPlugin from "@rollup/plugin-json";
+import { terser } from "rollup-plugin-terser";
 
 export default [
+  // cli
+  {
+    input: "src/cli.ts",
+    output: {
+      dir: "dist",
+      format: "cjs",
+    },
+    external: ["commander"],
+    plugins: [esbuild(), jsonPlugin(), terser()],
+  },
+
+  // index
   {
     input: "src/index.ts",
     output: {
       dir: "dist",
-      format: "commonjs",
+      format: "esm",
+      compact: true,
     },
-    plugins: [esbuild(), jsonPlugin()],
+    plugins: [esbuild(), terser()],
   },
 ];

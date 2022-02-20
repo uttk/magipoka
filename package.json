@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "node -r esbuild-register ./src/index.ts",
+    "dev": "node -r esbuild-register ./src/cli.ts",
     "clean": "rimraf dist/",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -48,6 +48,7 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.64.0",
     "rollup-plugin-esbuild": "^4.8.2",
+    "rollup-plugin-terser": "^7.0.2",
     "typescript": "^4.5.4",
     "vitest": "^0.3.2"
   },

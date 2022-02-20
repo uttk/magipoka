@@ -1,5 +1,3 @@
-import type { MagipokaConfig, MagipokaStrictConfig } from "../types";
-
 import { constants } from "fs";
 import fs from "fs/promises";
 import path from "path";
