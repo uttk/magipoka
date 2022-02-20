@@ -11,6 +11,18 @@ import { GenerateTargetTypes, GenerateCliOptions } from "../types";
 export const generateTargets: GenerateTargetTypes[] = ["next", "next/link"];
 
 /**
+ * filter generate target strings
+ */
+export const filterGenerateTarget = (target: GenerateTargetTypes[]): GenerateTargetTypes[] => {
+  const parents: string[] = target.flatMap((v) => (!v.includes("/") ? [v] : []));
+
+  return target.filter((v) => {
+    const [parent, sub] = v.split("/");
+    return (parent && !sub) || (sub && !parents.includes(parent));
+  });
+};
+
+/**
  * generate command
  */
 const command = async (target: GenerateTargetTypes[], options: GenerateCliOptions) => {
@@ -21,18 +33,12 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
   const baseConfig = options.config ? await loadConfig(options.config) : {};
 
   const config = mergeConfig(baseConfig, target, options);
+  const targets = filterGenerateTarget(config.target);
 
-  const tasks = config.target.map((target) => {
-    switch (target) {
-      case "next":
-        return generateNextTypes({ link: true });
+  const tasks = targets.map((target) => {
+    if (target.includes("next")) return generateNextTypes(target);
 
-      case "next/link":
-        return generateNextTypes({ link: true });
-
-      default:
-        throw new Error(`Unsupported target value : ${target}`);
-    }
+    throw new Error(`Unsupported target value : ${target}`);
   });
 
   const types = await Promise.all(tasks);

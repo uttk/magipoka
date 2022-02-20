@@ -4,14 +4,11 @@ import { generateNextLinkType } from "./link";
 import { getNextJsPageExtensions, getNextJsPages } from "./utils";
 
 import { getExistsPath } from "../../helpers/utils";
-
-export interface NextTypesOptions {
-  link: boolean;
-}
+import { GenerateTargetTypes } from "../../types";
 
 const defaultPages = ["//${string}", "http://${string}", "https://${string}"];
 
-export const generateNextTypes = async (options: NextTypesOptions) => {
+export const generateNextTypes = async (target: GenerateTargetTypes) => {
   const cwd = process.cwd();
 
   const [pagesPath, pageExtensions] = await Promise.all([
@@ -27,7 +24,7 @@ export const generateNextTypes = async (options: NextTypesOptions) => {
 
   const types = [];
 
-  if (options.link) {
+  if (["next", "next/link"].includes(target)) {
     types.push(generateNextLinkType());
   }
 
