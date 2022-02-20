@@ -1,7 +1,8 @@
 import { it, describe, expect, vi } from "vitest";
 
-import { type NextConfig, getNextJsPages, getNextJsPageExtensions } from "./nextjs";
-import * as utils from "./utils";
+import { type NextConfig, getNextJsPages, getNextJsPageExtensions } from "./utils";
+
+import * as utils from "../../helpers/utils";
 
 describe("getNextJsPageExtensions() Tests", () => {
   it("return page extensions for nextjs pages", async () => {

@@ -1,6 +1,6 @@
 import path from "path";
 
-import { getFilePaths } from "./utils";
+import { getFilePaths } from "../../helpers/utils";
 
 export interface NextConfig {
   pagesPath: string;

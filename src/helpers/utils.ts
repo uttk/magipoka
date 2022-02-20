@@ -42,3 +42,16 @@ export const getFilePaths = async (root: string, pageExtensions: string[]): Prom
 
   return filePaths;
 };
+
+export const saveFile = async (outputPath: string, fileStr: string, force?: boolean) => {
+  const exist = await isExistsPath(outputPath);
+
+  if (exist && !force) {
+    throw new Error(
+      "The output destination already exists. To overwrite, use the `-f, --force` options."
+    );
+  }
+
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.writeFile(outputPath, fileStr);
+};
