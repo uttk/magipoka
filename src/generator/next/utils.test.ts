@@ -1,12 +1,12 @@
 import { it, describe, expect, vi } from "vitest";
 
-import { type NextConfig, getNextJsPages, getNextJsPageExtensions } from "./utils";
+import { getNextJsPages, getNextJsPageExtensions } from "./utils";
 
 import * as utils from "../../helpers/utils";
 
 describe("getNextJsPageExtensions() Tests", () => {
   it("return page extensions for nextjs pages", async () => {
-    vi.mock("next.config.js", () => ({ pageExtensions: [".page.tsx"] }));
+    vi.mock("next.config.js", () => ({ pageExtensions: ["page.tsx"] }));
 
     const extensions = await getNextJsPageExtensions("");
 
@@ -16,39 +16,25 @@ describe("getNextJsPageExtensions() Tests", () => {
 
 describe("getNextJsPages() Tests", () => {
   it("returns a paths array from pages folders", async () => {
-    const config: NextConfig = {
-      pagesPath: "",
-      pageExtensions: [".page.tsx"],
-    };
-
     vi.spyOn(utils, "getFilePaths").mockResolvedValue(["/hello.tsx", "/world.page.tsx"]);
 
-    const result = await getNextJsPages(config);
+    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".page.tsx"] });
 
     expect(result).toStrictEqual(["/world"]);
   });
 
   it("returns a non-covered value", async () => {
-    const config: NextConfig = {
-      pagesPath: "",
-      pageExtensions: [".tsx"],
-    };
+    vi.spyOn(utils, "getFilePaths").mockResolvedValue([
+      "/[sample]/[param].tsx",
+      "/[sample]/[param]/index.tsx",
+    ]);
 
-    const pages = ["/[sample]/[param].tsx", "/[sample]/[param]/index.tsx"];
-
-    vi.spyOn(utils, "getFilePaths").mockResolvedValue(pages);
-
-    const result = await getNextJsPages(config);
+    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".tsx"] });
 
     expect(result).toStrictEqual(["/${string}/${string}/"]);
   });
 
   it("returns expected paths", async () => {
-    const config: NextConfig = {
-      pagesPath: "",
-      pageExtensions: [".tsx"],
-    };
-
     const pages = [
       "/index.tsx",
       "/a.tsx",
@@ -58,9 +44,14 @@ describe("getNextJsPages() Tests", () => {
       "/[p]/[p2]/index.tsx",
       "/f/[p]/g.tsx",
       "/ccc/",
+      "/ddd/[...params].tsx",
     ];
 
-    const expectPages = [
+    vi.spyOn(utils, "getFilePaths").mockResolvedValue(pages);
+
+    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".tsx"] });
+
+    expect(result).toStrictEqual([
       "/",
       "/a",
       "/b/c",
@@ -68,12 +59,17 @@ describe("getNextJsPages() Tests", () => {
       "/${string}/",
       "/${string}/${string}/",
       "/f/${string}/g",
-    ];
+      "/ddd/${string}",
+    ]);
+  });
 
-    vi.spyOn(utils, "getFilePaths").mockResolvedValue(pages);
+  it("does not include invalid pages", async () => {
+    const ignorePages = ["_app.tsx", "hoge.ts"];
 
-    const result = await getNextJsPages(config);
+    vi.spyOn(utils, "getFilePaths").mockResolvedValue(ignorePages);
 
-    expect(result).toStrictEqual(expectPages);
+    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".tsx"] });
+
+    expect(result).toHaveLength(0);
   });
 });

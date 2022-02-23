@@ -14,24 +14,16 @@ export const generateTargets: GenerateTargetTypes[] = ["next", "next/link"];
 /**
  * filter generate target strings
  */
-export const filterGenerateTarget = (target: GenerateTargetTypes[]): GenerateTargetTypes[] => {
-  const invalidTarget = target.find((t) => !generateTargets.includes(t));
+export const filterGenerateTargets = (
+  supports: GenerateTargetTypes[],
+  targets: GenerateTargetTypes[]
+): GenerateTargetTypes[] => {
+  return targets.filter((v) => {
+    if (!supports.includes(v)) return false;
 
-  if (invalidTarget) {
-    const message = [
-      `An unsupported target has been set: "${invalidTarget}"`,
-      "",
-      `Available generate targets: [${generateTargets.map((v) => `"${v}"`).join(", ")}]`,
-    ].join("\n");
+    const [parent, sub] = v.split("/") as GenerateTargetTypes[];
 
-    throw new Error(message);
-  }
-
-  const parents: string[] = target.flatMap((v) => (!v.includes("/") ? [v] : []));
-
-  return target.filter((v) => {
-    const [parent, sub] = v.split("/");
-    return (parent && !sub) || (sub && !parents.includes(parent));
+    return (!!parent && !sub) || !targets.includes(parent);
   });
 };
 
@@ -46,7 +38,7 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
   const baseConfig = await loadConfig(options.config);
 
   const config = mergeConfig(baseConfig, target, options);
-  const targets = filterGenerateTarget(config.target);
+  const targets = filterGenerateTargets(generateTargets, config.target);
 
   if (targets.length === 0) {
     const message = [

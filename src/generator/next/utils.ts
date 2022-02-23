@@ -2,7 +2,7 @@ import path from "path";
 
 import { getFilePaths } from "../../helpers/utils";
 
-export interface NextConfig {
+export interface GenerateNextOption {
   pagesPath: string;
   pageExtensions: string[];
 }
@@ -15,11 +15,13 @@ export const getNextJsPageExtensions = async (rootPath: string): Promise<string[
 
   if (!config) return defaultExtensions;
 
-  return Array.isArray(config.pageExtensions) ? config.pageExtensions : defaultExtensions;
+  return Array.isArray(config.pageExtensions)
+    ? config.pageExtensions.map((v: string) => `.${v}`)
+    : defaultExtensions;
 };
 
-export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
-  const { pagesPath, pageExtensions } = config;
+export const getNextJsPages = async (options: GenerateNextOption): Promise<string[]> => {
+  const { pagesPath, pageExtensions } = options;
 
   const pages = await getFilePaths(pagesPath, pageExtensions);
 
@@ -32,6 +34,7 @@ export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
 
   pages.forEach((page) => {
     if (!page.match(pagePattern)) return;
+    if (path.basename(page).startsWith("_")) return;
 
     const newPages = page
       .replace(pagesPath, "")
@@ -51,6 +54,7 @@ export const getNextJsPages = async (config: NextConfig): Promise<string[]> => {
     const secondLast = newPages[len - 2];
 
     if (last === "${string}") newPages.push("");
+    if (last === "${...string}") newPages[len - 1] = "${string}";
     if (last === "" && secondLast.length && secondLast !== "${string}") newPages.pop();
 
     pageList[newPages.join("/")] = true;
