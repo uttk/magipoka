@@ -8,7 +8,7 @@ export default [
     input: "src/cli.ts",
     output: {
       dir: "dist",
-      format: "cjs",
+      format: "esm",
     },
     external: ["commander"],
     plugins: [esbuild(), jsonPlugin(), terser()],

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "dist/index.js",
   "author": "uttk <46495635+uttk@users.noreply.github.com>",
+  "type": "module",
   "license": "MIT",
   "bin": {
     "magipoka": "bin/index.js"
