@@ -52,11 +52,16 @@ const AnyComponent = () => {
 
 ### About trailing slash
 
-If the path contains uncertain values such as parameters, such as in dynamic routing in Next.js, `/` is added to the end of the generated type. This is due to the limitations of TypeScript's template string types. If you don't like this behavior, you can use a utility function to remove the trailing slash.
+If the path contains uncertain values such as parameters, such as in dynamic routing in Next.js, `/` is added to the end of the generated type. This is due to the limitations of TypeScript's template string types. If you don't like this behavior, you'll need to use a utility function to remove the trailing slash.
 
 ```tsx
 import Link from "next/link";
-import { removeTrailingSlash as r } from "magipoka";
+import { NextPagesType } from "magipoka/next";
+
+const r = (path: NextPagesType): NextPagesType => {
+  if (path === "/") return path;
+  return path.replace(/\/$/, "") as NextPagesType;
+};
 
 const AnyComponent = () => {
   return (
@@ -67,7 +72,7 @@ const AnyComponent = () => {
       </Link>
 
       {/* ✅ Make it be treated as "/user/1" */}
-      <Link href={r`/user/1/`}>
+      <Link href={r("/user/1/")}>
         <a>any link</a>
       </Link>
 
@@ -145,7 +150,7 @@ You can use `magipoka.config.js` to config the output settings, and the values t
 ```js
 // magipoka.config.js
 
-/** @type {import("magipoka").ConfigType} */
+/** @type {import("magipoka").MagipokaConfig} */
 module.exports = {
   /**
    * Allow files to be overwritten
