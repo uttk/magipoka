@@ -1,4 +1,3 @@
-import fs from "fs/promises";
 import path from "path";
 
 import {
@@ -8,8 +7,19 @@ import {
   GenerateTargetTypes,
 } from "../types";
 
-export const loadConfig = async (configPath: string): Promise<MagipokaStrictConfig> => {
-  return fs.readFile(path.resolve(configPath), "utf8").then((v) => JSON.parse(v));
+export const loadConfig = async (filePath?: string): Promise<MagipokaStrictConfig> => {
+  let configPath = path.resolve("./magipoka.config.js");
+
+  if (filePath) {
+    const { ext, dir, base } = path.parse(filePath);
+
+    configPath =
+      ext !== ".js" ? path.resolve(dir, base, "magipoka.config.js") : path.resolve(filePath);
+  }
+
+  const config = await import(configPath).catch(() => ({ default: {} }));
+
+  return config.default;
 };
 
 export const mergeConfig = (

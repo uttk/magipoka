@@ -2,6 +2,7 @@ import path from "path";
 
 import { generateNextTypes } from "../generator/next";
 import { loadConfig, mergeConfig } from "../helpers/config";
+import { Logs } from "../helpers/logs";
 import { saveFile } from "../helpers/utils";
 import { GenerateTargetTypes, GenerateCliOptions } from "../types";
 
@@ -14,6 +15,18 @@ export const generateTargets: GenerateTargetTypes[] = ["next", "next/link"];
  * filter generate target strings
  */
 export const filterGenerateTarget = (target: GenerateTargetTypes[]): GenerateTargetTypes[] => {
+  const invalidTarget = target.find((t) => !generateTargets.includes(t));
+
+  if (invalidTarget) {
+    const message = [
+      `An unsupported target has been set: "${invalidTarget}"`,
+      "",
+      `Available generate targets: [${generateTargets.map((v) => `"${v}"`).join(", ")}]`,
+    ].join("\n");
+
+    throw new Error(message);
+  }
+
   const parents: string[] = target.flatMap((v) => (!v.includes("/") ? [v] : []));
 
   return target.filter((v) => {
@@ -30,10 +43,20 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
     process.chdir(options.rootDir);
   }
 
-  const baseConfig = options.config ? await loadConfig(options.config) : {};
+  const baseConfig = await loadConfig(options.config);
 
   const config = mergeConfig(baseConfig, target, options);
   const targets = filterGenerateTarget(config.target);
+
+  if (targets.length === 0) {
+    const message = [
+      "The output target was not found. Use the config file or the `-c, --config` option to set the output target.",
+      "",
+      `Available generate targets: [${generateTargets.map((v) => `"${v}"`).join(", ")}]`,
+    ].join("\n");
+
+    throw new Error(message);
+  }
 
   const tasks = targets.map((target) => {
     if (target.includes("next")) return generateNextTypes(target);
@@ -53,11 +76,19 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
   if (!fileStr.length) throw new Error("Empty File can not generate");
 
   await saveFile(outputPath, fileStr, options.force);
+
+  return { outputPath };
 };
 
 export const generateCommand = (target: GenerateTargetTypes[], options: GenerateCliOptions) => {
-  command(target, options).catch((error) => {
-    console.error(error?.message || "An Error has occurred");
-    process.exitCode = 1;
-  });
+  const spinner = Logs.loading("Now generating...\n");
+
+  command(target, options)
+    .then(({ outputPath }) => {
+      spinner.succeed(`File generation was successful!: ${Logs.link(outputPath)}\n`);
+    })
+    .catch((error) => {
+      spinner.fail(` ${error?.message || "An Error has occurred"}\n`);
+      process.exitCode = 1;
+    });
 };

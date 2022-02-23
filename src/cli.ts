@@ -16,29 +16,14 @@ cli
 
 // generate command
 cli
-  .command("generate")
+  .command("generate", { isDefault: true })
   .description("Generate type files from passed options")
-  .addArgument(new Argument("<targets...>", "oputput target").choices(generateTargets))
+  .addArgument(new Argument("[targets...]", "oputput target").choices(generateTargets))
   .option("-f, --force", "Forces the output of the files")
   .option("-r, --rootDir <path>", "set a root directory path")
   .option("-o, --outDir <path>", "set a output directry path")
   .option("-n, --filename <name>", "set a output filename")
   .option("-c, --config <path>", "set a config path")
   .action(generateCommand);
-
-// default command
-cli
-  .description("default command")
-  .option("-c, --config <path>", "set a config path")
-  .action(async (options) => {
-    const configPath = options.config;
-
-    if (!configPath) {
-      cli.help();
-      return;
-    }
-
-    await generateCommand([], { config: configPath });
-  });
 
 cli.parse();
