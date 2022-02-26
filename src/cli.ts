@@ -1,6 +1,6 @@
 import { Argument, Command } from "commander";
 
-import { generateCommand, generateTargets } from "./command/generate";
+import { generateCommand, allowGenerateTargets } from "./command/generate";
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -18,12 +18,14 @@ cli
 cli
   .command("generate", { isDefault: true })
   .description("Generate type files from passed options")
-  .addArgument(new Argument("[targets...]", "oputput target").choices(generateTargets))
+  .addArgument(new Argument("[targets...]", "oputput target").choices(allowGenerateTargets))
   .option("-f, --force", "Forces the output of the files")
   .option("-r, --rootDir <path>", "set a root directory path")
   .option("-o, --outDir <path>", "set a output directry path")
   .option("-n, --filename <name>", "set a output filename")
   .option("-c, --config <path>", "set a config path")
+  .option("-t, --type-helper", "set a flag for the Type Helper")
+  .option("--no-type-helper", "disable type helper")
   .action(generateCommand);
 
 cli.parse();

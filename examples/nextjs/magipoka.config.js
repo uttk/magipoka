@@ -1,5 +1,6 @@
 /** @type {import("magipoka").MagipokaConfig} */
 module.exports = {
-  target: ["next"],
+  force: true,
   outDir: "dist",
+  target: ["next"],
 };

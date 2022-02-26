@@ -22,6 +22,7 @@ export const formatNextJsPages = ({
   pagesPath: string;
   pageExtensions: string[];
 }): string[] => {
+  const indexFilePattern = /index$/;
   const extPattern = new RegExp(pageExtensions.join("|").replace(/\./g, "\\."));
   const pagePattern = new RegExp(`(?:${extPattern.source})$`);
 
@@ -30,12 +31,11 @@ export const formatNextJsPages = ({
       return !!page.match(pagePattern) && !path.basename(page).startsWith("_");
     })
     .map((page) => {
-      return page.replace(pagesPath, "").replace(extPattern, "");
+      return page.replace(pagesPath, "").replace(extPattern, "").replace(indexFilePattern, "");
     });
 };
 
 export const getNextJsPagePaths = (pages: string[]): string[] => {
-  const indexFilePattern = /index$/;
   const paramPattern = /\[([^\./]+)\]/g;
   const catchAllPattern = /\[(\.\.\.[^\.]+)\].*/;
 
@@ -43,7 +43,6 @@ export const getNextJsPagePaths = (pages: string[]): string[] => {
 
   pages.forEach((page) => {
     let newPage = page
-      .replace(indexFilePattern, "")
       .replaceAll(paramPattern, "${string}")
       .replace(catchAllPattern, "${string}")
       .replace(/(?<=.+)\/$/, "");

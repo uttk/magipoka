@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "author": "uttk <46495635+uttk@users.noreply.github.com>",
   "type": "module",
+  "types": "./dist/index.d.ts",
   "exports": "./dist/index.js",
   "license": "MIT",
   "bin": {

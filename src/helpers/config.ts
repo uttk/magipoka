@@ -1,11 +1,15 @@
 import path from "path";
 
-import {
-  MagipokaConfig,
-  GenerateCliOptions,
-  MagipokaStrictConfig,
-  GenerateTargetTypes,
-} from "../types";
+import { MagipokaStrictConfig } from "../types";
+
+export const defaultConfig: MagipokaStrictConfig = {
+  target: [],
+  force: false,
+  typeHelper: true,
+  outDir: process.cwd(),
+  rootDir: process.cwd(),
+  filename: "magipoka.d.ts",
+};
 
 export const loadConfig = async (filePath?: string): Promise<MagipokaStrictConfig> => {
   let configPath = path.resolve("./magipoka.config.js");
@@ -19,21 +23,5 @@ export const loadConfig = async (filePath?: string): Promise<MagipokaStrictConfi
 
   const config = await import(configPath).catch(() => ({ default: {} }));
 
-  return config.default;
-};
-
-export const mergeConfig = (
-  baseConfig: MagipokaConfig,
-  target: GenerateTargetTypes[],
-  options: GenerateCliOptions
-): MagipokaStrictConfig => {
-  return {
-    target: target || [],
-    force: false,
-    rootDir: process.cwd(),
-    outDir: process.cwd(),
-    filename: "magipoka.d.ts",
-    ...baseConfig,
-    ...options,
-  };
+  return { ...defaultConfig, ...config.default };
 };

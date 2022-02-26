@@ -40,7 +40,7 @@ describe("formatNextJsPages() Tests", () => {
       pageExtensions: [".tsx"],
     });
 
-    expect(result).toStrictEqual(["/[sample]/[param]", "/[sample]/[param]/index"]);
+    expect(result).toStrictEqual(["/[sample]/[param]", "/[sample]/[param]/"]);
   });
 
   it("returns expected paths", () => {
@@ -59,12 +59,12 @@ describe("formatNextJsPages() Tests", () => {
     const result = formatNextJsPages({ pages, pagesPath: "", pageExtensions: [".tsx"] });
 
     expect(result).toStrictEqual([
-      "/index",
+      "/",
       "/a",
       "/b/c",
-      "/d/e/index",
+      "/d/e/",
       "/[p]",
-      "/[p]/[p2]/index",
+      "/[p]/[p2]/",
       "/f/[p]/g",
       "/ddd/[...params]",
     ]);
@@ -86,7 +86,7 @@ describe("formatNextJsPages() Tests", () => {
 describe("getNextJsPagePaths() Tests", () => {
   it("convert to template string type", () => {
     const results = getNextJsPagePaths([
-      "/index",
+      "/",
       "/hoge",
       "/hoge/[param]",
       "/hoge/[param]/[param2]",
@@ -102,7 +102,7 @@ describe("getNextJsPagePaths() Tests", () => {
   });
 
   it("remove duplicates", () => {
-    const results = getNextJsPagePaths(["/hoge", "/hoge", "/hoge/index"]);
+    const results = getNextJsPagePaths(["/hoge", "/hoge"]);
     expect(results).toStrictEqual(["/hoge"]);
   });
 });

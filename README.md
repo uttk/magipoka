@@ -85,6 +85,45 @@ const AnyComponent = () => {
 };
 ```
 
+### About Type Helpers
+
+Template string types are not displayed as input completions on some editors such as VS Code. To avoid this, Magipoka adds a string starting with `path: *` to the generated type.
+
+For example:
+
+```ts
+// magipoka.d.ts
+
+declare module "next/link" {
+  // The types generated based on routing `pages` directory in Next.js
+  type PagesType =
+    | "/"
+    | "/hoge"
+    | `/user/${string}/`
+    // After that, helper type
+    | "path:/"
+    | "path:/hoge"
+    | "path:/user/[uid]"; // For helper type, display the file name of the generator
+
+  // ...
+}
+```
+
+However, although these helper types do not result in type errors, they can result in run-time errors.
+If you don't like this behavior, you can disable it with the `--no-type-helper` option or `typeHelper` in magipoka.config.js.
+
+```shell
+$> magipoka --no-type-helper
+```
+
+or
+
+```js
+module.exports = {
+  typeHelper: false,
+};
+```
+
 ## Install
 
 **npm (Local install)**

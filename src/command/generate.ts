@@ -1,7 +1,7 @@
 import path from "path";
 
-import { generateNextTypes } from "../generator/next";
-import { loadConfig, mergeConfig } from "../helpers/config";
+import { allowNextJsTargets, generateNextTypes } from "../generator/next";
+import { loadConfig } from "../helpers/config";
 import { Logs } from "../helpers/logs";
 import { saveFile } from "../helpers/utils";
 import { GenerateTargetTypes, GenerateCliOptions } from "../types";
@@ -9,23 +9,7 @@ import { GenerateTargetTypes, GenerateCliOptions } from "../types";
 /**
  * supported generates type
  */
-export const generateTargets: GenerateTargetTypes[] = ["next", "next/link"];
-
-/**
- * filter generate target strings
- */
-export const filterGenerateTargets = (
-  supports: GenerateTargetTypes[],
-  targets: GenerateTargetTypes[]
-): GenerateTargetTypes[] => {
-  return targets.filter((v) => {
-    if (!supports.includes(v)) return false;
-
-    const [parent, sub] = v.split("/") as GenerateTargetTypes[];
-
-    return (!!parent && !sub) || !targets.includes(parent);
-  });
-};
+export const allowGenerateTargets: GenerateTargetTypes[] = [...allowNextJsTargets];
 
 /**
  * generate command
@@ -36,22 +20,23 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
   }
 
   const baseConfig = await loadConfig(options.config);
+  const config = {
+    ...baseConfig,
+    target: baseConfig.target.concat(target).filter((v) => allowGenerateTargets.includes(v)),
+  };
 
-  const config = mergeConfig(baseConfig, target, options);
-  const targets = filterGenerateTargets(generateTargets, config.target);
-
-  if (targets.length === 0) {
+  if (config.target.length === 0) {
     const message = [
       "The output target was not found. Use the config file or the `-c, --config` option to set the output target.",
       "",
-      `Available generate targets: [${generateTargets.map((v) => `"${v}"`).join(", ")}]`,
+      `Available generate targets: [${allowGenerateTargets.map((v) => `"${v}"`).join(", ")}]`,
     ].join("\n");
 
     throw new Error(message);
   }
 
-  const tasks = targets.map((target) => {
-    if (target.includes("next")) return generateNextTypes(target);
+  const tasks = config.target.map((target) => {
+    if (target.includes("next")) return generateNextTypes(config);
 
     throw new Error(`Unsupported target value : ${target}`);
   });
@@ -67,7 +52,7 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
 
   if (!fileStr.length) throw new Error("Empty File can not generate");
 
-  await saveFile(outputPath, fileStr, options.force);
+  await saveFile(outputPath, fileStr, config.force);
 
   return { outputPath };
 };
