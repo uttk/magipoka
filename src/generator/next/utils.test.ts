@@ -1,8 +1,6 @@
 import { it, describe, expect, vi } from "vitest";
 
-import { getNextJsPages, getNextJsPageExtensions } from "./utils";
-
-import * as utils from "../../helpers/utils";
+import { formatNextJsPages, getNextJsPageExtensions, getNextJsPagePaths } from "./utils";
 
 describe("getNextJsPageExtensions() Tests", () => {
   it("return page extensions for nextjs pages", async () => {
@@ -14,27 +12,38 @@ describe("getNextJsPageExtensions() Tests", () => {
   });
 });
 
-describe("getNextJsPages() Tests", () => {
-  it("returns a paths array from pages folders", async () => {
-    vi.spyOn(utils, "getFilePaths").mockResolvedValue(["/hello.tsx", "/world.page.tsx"]);
+describe("formatNextJsPages() Tests", () => {
+  it("remove pagesPath", () => {
+    const result = formatNextJsPages({
+      pages: ["/remove-path/pages/hoge.tsx"],
+      pagesPath: "/remove-path",
+      pageExtensions: [".tsx"],
+    });
 
-    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".page.tsx"] });
+    expect(result).toStrictEqual(["/pages/hoge"]);
+  });
+
+  it("returns a paths array from pages folders", () => {
+    const result = formatNextJsPages({
+      pages: ["/hello.tsx", "/world.page.tsx"],
+      pagesPath: "",
+      pageExtensions: [".page.tsx"],
+    });
 
     expect(result).toStrictEqual(["/world"]);
   });
 
-  it("returns a non-covered value", async () => {
-    vi.spyOn(utils, "getFilePaths").mockResolvedValue([
-      "/[sample]/[param].tsx",
-      "/[sample]/[param]/index.tsx",
-    ]);
+  it("returns a non-covered value", () => {
+    const result = formatNextJsPages({
+      pages: ["/[sample]/[param].tsx", "/[sample]/[param]/index.tsx"],
+      pagesPath: "",
+      pageExtensions: [".tsx"],
+    });
 
-    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".tsx"] });
-
-    expect(result).toStrictEqual(["/${string}/${string}/"]);
+    expect(result).toStrictEqual(["/[sample]/[param]", "/[sample]/[param]/index"]);
   });
 
-  it("returns expected paths", async () => {
+  it("returns expected paths", () => {
     const pages = [
       "/index.tsx",
       "/a.tsx",
@@ -47,29 +56,41 @@ describe("getNextJsPages() Tests", () => {
       "/ddd/[...params].tsx",
     ];
 
-    vi.spyOn(utils, "getFilePaths").mockResolvedValue(pages);
-
-    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".tsx"] });
+    const result = formatNextJsPages({ pages, pagesPath: "", pageExtensions: [".tsx"] });
 
     expect(result).toStrictEqual([
-      "/",
+      "/index",
       "/a",
       "/b/c",
-      "/d/e",
-      "/${string}/",
-      "/${string}/${string}/",
-      "/f/${string}/g",
-      "/ddd/${string}",
+      "/d/e/index",
+      "/[p]",
+      "/[p]/[p2]/index",
+      "/f/[p]/g",
+      "/ddd/[...params]",
     ]);
   });
 
-  it("does not include invalid pages", async () => {
+  it("does not include invalid pages", () => {
     const ignorePages = ["_app.tsx", "hoge.ts"];
 
-    vi.spyOn(utils, "getFilePaths").mockResolvedValue(ignorePages);
-
-    const result = await getNextJsPages({ pagesPath: "", pageExtensions: [".tsx"] });
+    const result = formatNextJsPages({
+      pages: ignorePages,
+      pagesPath: "",
+      pageExtensions: [".tsx"],
+    });
 
     expect(result).toHaveLength(0);
+  });
+});
+
+describe("getNextJsPagePaths() Tests", () => {
+  it("convert to template string type", () => {
+    const results = getNextJsPagePaths(["/index", "/hoge", "/hoge/[param]", "/hello/[...world]"]);
+    expect(results).toStrictEqual(["/", "/hoge", "/hoge/${string}/", "/hello/${string}"]);
+  });
+
+  it("remove duplicates", () => {
+    const results = getNextJsPagePaths(["/hoge", "/hoge", "/hoge/index"]);
+    expect(results).toStrictEqual(["/hoge"]);
   });
 });

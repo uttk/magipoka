@@ -1,9 +1,9 @@
 import path from "path";
 
 import { generateNextLinkType } from "./link";
-import { getNextJsPageExtensions, getNextJsPages } from "./utils";
+import { formatNextJsPages, getNextJsPageExtensions, getNextJsPagePaths } from "./utils";
 
-import { getExistsPath } from "../../helpers/utils";
+import { getExistsPath, getFilePaths } from "../../helpers/utils";
 import { GenerateTargetTypes } from "../../types";
 
 const defaultPages = ["//${string}", "http://${string}", "https://${string}"];
@@ -18,21 +18,19 @@ export const generateNextTypes = async (target: GenerateTargetTypes) => {
     getNextJsPageExtensions(cwd).catch(() => [".jsx", ".tsx"]),
   ]);
 
-  const pages = await getNextJsPages({ pagesPath, pageExtensions }).then((v) => {
-    return defaultPages.concat(v);
-  });
+  const pages = await getFilePaths(pagesPath, pageExtensions);
 
-  const types = [];
+  const formatedPages = formatNextJsPages({ pages, pagesPath, pageExtensions });
+  const pageHelpers = formatedPages.map((page) => page.replace(/index$/, ""));
 
-  if (["next", "next/link"].includes(target)) {
-    types.push(generateNextLinkType());
-  }
+  const paths = [defaultPages, getNextJsPagePaths(formatedPages)].flat().map((v) => `\`${v}\``);
+  const helpers = [defaultPages, pageHelpers].flat().map((v) => `"path:${v}"`);
 
   return `
     declare module "magipoka/next" {
-      export type NextPagesType = ${pages.map((v) => `\`${v}\``).join("|")}
+      export type NextPagesType = ${paths.join("|")} | ${helpers.join("|")}
     }
 
-    ${types.join("\n")}
+    ${["next", "next/link"].includes(target) ? generateNextLinkType() : ""}
   `;
 };
