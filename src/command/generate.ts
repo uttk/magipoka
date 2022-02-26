@@ -22,6 +22,7 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
   const baseConfig = await loadConfig(options.config);
   const config = {
     ...baseConfig,
+    ...options,
     target: baseConfig.target.concat(target).filter((v) => allowGenerateTargets.includes(v)),
   };
 

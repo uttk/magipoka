@@ -24,7 +24,7 @@ cli
   .option("-o, --outDir <path>", "set a output directry path")
   .option("-n, --filename <name>", "set a output filename")
   .option("-c, --config <path>", "set a config path")
-  .option("-t, --type-helper", "set a flag for the Type Helper")
+  .option("-t, --type-helper", "enable the Type Helper")
   .option("--no-type-helper", "disable type helper")
   .action(generateCommand);
 
