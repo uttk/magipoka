@@ -16,7 +16,7 @@ export interface MagipokaConfig {
   force?: boolean;
 
   /**
-   * Enable Type Helpers.
+   * Enable Type Helpers
    *
    * @default
    * typeHelper: true // By default, Type Helper is enabled

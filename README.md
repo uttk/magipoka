@@ -163,6 +163,8 @@ Options:
   -o, --outDir <path>    set a output directry path
   -n, --filename <name>  set a output filename
   -c, --config <path>    set a config path
+  -t, --type-helper      set a flag for the Type Helper
+  --no-type-helper       disable type helper
   -h, --help             display help for command
 ```
 
@@ -195,6 +197,11 @@ module.exports = {
    * Allow files to be overwritten
    */
   force: false,
+
+  /**
+   * Enable Type Helpers
+   */
+  typeHelper: true,
 
   /**
    * Root directory path
