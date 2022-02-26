@@ -1,11 +1,24 @@
 {
   "name": "magipoka",
   "version": "0.0.1",
+  "description": "Zero-runtime type-safe routing library",
+  "keywords": [
+    "typescript",
+    "zero-runtime",
+    "type-safe routing"
+  ],
+  "bugs": {
+    "url": "https://github.com/uttk/magipoka/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uttk/magipoka"
+  },
+  "license": "MIT",
   "author": "uttk <46495635+uttk@users.noreply.github.com>",
   "type": "module",
-  "types": "./dist/index.d.ts",
   "exports": "./dist/index.js",
-  "license": "MIT",
+  "types": "./dist/index.d.ts",
   "bin": {
     "magipoka": "bin/index.js"
   },
@@ -13,9 +26,6 @@
     "bin",
     "dist"
   ],
-  "engines": {
-    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
-  },
   "scripts": {
     "dev": "node ./dist/cli.js",
     "clean": "rimraf dist/",
@@ -31,6 +41,15 @@
     "fix": "run-s fix:*",
     "fix:eslint": "eslint --cache --fix \"./{src,tests}/**/*.{js,ts}\"",
     "fix:prettier": "prettier --write \"./{src,tests}/**/*.{js,ts}\""
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix --cache",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "chalk": "^5.0.0",
@@ -60,13 +79,7 @@
     "typescript": "^4.5.5",
     "vitest": "^0.3.2"
   },
-  "lint-staged": {
-    "*.{js,ts}": [
-      "eslint --fix --cache",
-      "prettier --write"
-    ],
-    "*.json": [
-      "prettier --write"
-    ]
+  "engines": {
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   }
 }
