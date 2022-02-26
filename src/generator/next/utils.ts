@@ -36,7 +36,7 @@ export const formatNextJsPages = ({
 
 export const getNextJsPagePaths = (pages: string[]): string[] => {
   const indexFilePattern = /index$/;
-  const paramPattern = /\[([^\.]+)\]/g;
+  const paramPattern = /\[([^\./]+)\]/g;
   const catchAllPattern = /\[(\.\.\.[^\.]+)\].*/;
 
   const pageList: Record<string, boolean> = {};

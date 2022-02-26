@@ -85,8 +85,20 @@ describe("formatNextJsPages() Tests", () => {
 
 describe("getNextJsPagePaths() Tests", () => {
   it("convert to template string type", () => {
-    const results = getNextJsPagePaths(["/index", "/hoge", "/hoge/[param]", "/hello/[...world]"]);
-    expect(results).toStrictEqual(["/", "/hoge", "/hoge/${string}/", "/hello/${string}"]);
+    const results = getNextJsPagePaths([
+      "/index",
+      "/hoge",
+      "/hoge/[param]",
+      "/hoge/[param]/[param2]",
+      "/hello/[...world]",
+    ]);
+    expect(results).toStrictEqual([
+      "/",
+      "/hoge",
+      "/hoge/${string}/",
+      "/hoge/${string}/${string}/",
+      "/hello/${string}",
+    ]);
   });
 
   it("remove duplicates", () => {
