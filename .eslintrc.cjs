@@ -4,11 +4,7 @@ module.exports = {
     es2021: true,
   },
 
-  extends: [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:import/recommended",
-    "prettier",
-  ],
+  extends: ["plugin:@typescript-eslint/recommended", "plugin:import/recommended", "prettier"],
 
   parser: "@typescript-eslint/parser",
 
@@ -30,7 +26,7 @@ module.exports = {
     },
   },
 
-  ignorePatterns: [".eslintrc.js", "dist"],
+  ignorePatterns: [".eslintrc.js", "/dist/", "/node_modules/", "examples"],
 
   overrides: [
     {
@@ -39,7 +35,7 @@ module.exports = {
         "import/order": [
           "error",
           {
-            groups: ["type", "external", "internal", "sibling"],
+            groups: ["type", "builtin", "external", "internal", "sibling"],
             pathGroups: [],
             alphabetize: {
               order: "asc",

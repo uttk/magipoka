@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "rootDir": "src",
+    "module": "ESNext",
     "target": "ES2020",
     "lib": ["ESNext"],
     "strict": true,
@@ -12,6 +13,6 @@
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules", "**/dist/**", "**/tests/**", "**/*.test.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.d.ts", "**/dist/**", "**/tests/**", "**/*.test.ts"]
 }
