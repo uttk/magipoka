@@ -50,7 +50,7 @@ const AnyComponent = () => {
 };
 ```
 
-### About trailing slash
+## About trailing slash
 
 If the path contains uncertain values such as parameters, such as in dynamic routing in Next.js, `/` is added to the end of the generated type. This is due to the limitations of TypeScript's template string types. If you don't like this behavior, you'll need to use a utility function to remove the trailing slash.
 
@@ -85,7 +85,7 @@ const AnyComponent = () => {
 };
 ```
 
-### About Type Helpers
+## About Type Helpers
 
 Template string types are not displayed as input completions on some editors such as VS Code. To avoid this, Magipoka adds a string starting with `path: *` to the generated type.
 
