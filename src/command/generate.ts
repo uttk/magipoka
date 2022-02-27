@@ -36,13 +36,11 @@ const command = async (target: GenerateTargetTypes[], options: GenerateCliOption
     throw new Error(message);
   }
 
-  const tasks = config.target.map((target) => {
-    if (target.includes("next")) return generateNextTypes(config);
+  const tasks = [generateNextTypes(config)];
 
-    throw new Error(`Unsupported target value : ${target}`);
+  const types = await Promise.all(tasks).then((results) => {
+    return results.filter<string>((v): v is string => !!v);
   });
-
-  const types = await Promise.all(tasks);
 
   const {
     default: { format },

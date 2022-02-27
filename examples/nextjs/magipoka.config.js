@@ -2,5 +2,5 @@
 module.exports = {
   force: true,
   outDir: "dist",
-  target: ["next"],
+  target: ["next", "next/link"],
 };

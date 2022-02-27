@@ -21,7 +21,11 @@ const getNextJsTargets = (target: string[]): NextJsGenerateTarget => {
     : allowNextJsTargets.reduce((flags, key) => ({ ...flags, [key]: target.includes(key) }), dict);
 };
 
-export const generateNextTypes = async (config: MagipokaStrictConfig) => {
+export const generateNextTypes = async (
+  config: MagipokaStrictConfig
+): Promise<string | undefined> => {
+  if (!config.target.some((v) => v.includes("next"))) return;
+
   const cwd = process.cwd();
   const targetFlags = getNextJsTargets(config.target);
 
