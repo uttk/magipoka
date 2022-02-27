@@ -27,7 +27,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "node ./dist/cli.js",
+    "dev": "node --loader ts-node/esm --experimental-specifier-resolution=node ./src/cli.ts",
     "clean": "rimraf dist/",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -76,6 +76,7 @@
     "rollup": "^2.64.0",
     "rollup-plugin-esbuild": "^4.8.2",
     "rollup-plugin-terser": "^7.0.2",
+    "ts-node": "^10.5.0",
     "typescript": "^4.5.5",
     "vitest": "^0.3.2"
   },

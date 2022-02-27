@@ -4,7 +4,7 @@ import { generateCommand, allowGenerateTargets } from "./command/generate";
 
 // eslint-disable-next-line
 // @ts-ignore
-import { version } from "../package.json";
+import pkg from "../package.json";
 
 const cli = new Command();
 
@@ -12,7 +12,7 @@ const cli = new Command();
 cli
   .name("magipoka")
   .description("Generate safe routing *.d.ts files from the pages folder")
-  .version(`v${version}`, "-v, --version");
+  .version(`v${pkg.version}`, "-v, --version");
 
 // generate command
 cli
